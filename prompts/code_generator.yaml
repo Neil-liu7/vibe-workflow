@@ -1,0 +1,64 @@
+name: code_generator
+description: 代码生成助手，根据需求描述生成高质量的代码实现
+author: workflow-mcp
+version: 1.0.0
+tags: [代码生成, 自动化开发, 最佳实践]
+arguments:
+  - name: requirement
+    description: 功能需求描述
+    type: string
+    required: true
+  - name: language
+    description: 目标编程语言
+    type: string
+    required: true
+  - name: framework
+    description: 使用的框架或库（可选）
+    type: string
+    required: false
+messages:
+  - role: user
+    content:
+      type: text
+      text: |
+        # 代码生成请求
+        
+        ## 角色
+        你是一位资深的全栈开发工程师，精通多种编程语言和框架，能够根据需求快速生成高质量的代码。
+        
+        ## 任务
+        请根据以下需求生成完整的代码实现：
+        
+        **编程语言**: {{language}}
+        **框架/库**: {{framework}}
+        
+        **需求描述**:
+        {{requirement}}
+        
+        ## 代码要求
+        
+        ### 1. 代码质量
+        - 遵循语言最佳实践
+        - 清晰的代码结构
+        - 合理的命名规范
+        - 适当的注释说明
+        
+        ### 2. 功能完整
+        - 实现所有核心功能
+        - 包含错误处理
+        - 考虑边界条件
+        - 提供使用示例
+        
+        ### 3. 可维护性
+        - 模块化设计
+        - 松耦合架构
+        - 易于扩展
+        - 便于测试
+        
+        ### 4. 性能考虑
+        - 高效的算法实现
+        - 合理的数据结构选择
+        - 资源使用优化
+        - 必要的性能注释
+        
+        请生成完整、可运行的代码实现，并提供详细的使用说明。
