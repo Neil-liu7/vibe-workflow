@@ -1,0 +1,21 @@
+name: code-review
+description: Code review prompt template
+content: |
+  Please review the following code:
+  
+  {{code}}
+  
+  Focus on:
+  - Code quality and best practices
+  - Potential bugs or issues
+  - Performance considerations
+  - Maintainability
+  
+  Language: {{language}}
+arguments:
+  - name: code
+    type: string
+    description: The code to review
+  - name: language
+    type: string
+    description: Programming language
