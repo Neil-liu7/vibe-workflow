@@ -8,7 +8,7 @@ import { workflowDefine } from "./tools/workflow-define.js";
 // TODO: Import these modules when they are created
 import { workflowRun } from "./tools/workflow-run.js";
 import { workflowSave } from "./tools/workflow-save.js";
-// import { registerPromptTools } from "./tools/prompt-manager.js";
+import { registerPromptTools } from "./tools/prompt-manager.js";
 
 function expandTildePath(path: string): string {
   if (path.startsWith('~/') || path === '~') {
@@ -26,7 +26,7 @@ async function registerTools(projectPath: string) {
   // TODO: Register tools when they are implemented
   workflowSave(projectPath);
   workflowRun(projectPath);
-  // registerPromptTools(projectPath);
+  registerPromptTools(projectPath);
 }
 
 async function main() {
