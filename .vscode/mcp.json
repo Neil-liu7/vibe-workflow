@@ -1,0 +1,12 @@
+{
+	"servers": {
+		"workflow": {
+			"type": "stdio",
+			"command": "node",
+			"args": [
+				"dist/index.js"
+			]
+		}
+	},
+	"inputs": []
+}

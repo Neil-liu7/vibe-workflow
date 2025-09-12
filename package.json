@@ -1,0 +1,44 @@
+{
+  "name": "workflow-mcp",
+  "version": "1.0.0",
+  "description": "MCP server for custom workflow",
+  "main": "dist/index.js",
+  "type": "module",
+  "bin": {
+    "workflow": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "npm run clean && tsc",
+    "start": "npm run build && npx @modelcontextprotocol/inspector node dist/index.js",
+    "clean": "rimraf dist",
+    "web:dev": "concurrently \"npm run web:server\" \"npm run web:client\"",
+    "web:server": "cd web-app/server && npm run dev",
+    "web:client": "cd web-app/client && npm run dev",
+    "web:build": "npm run web:server:build && npm run web:client:build",
+    "web:server:build": "cd web-app/server && npm run build",
+    "web:client:build": "cd web-app/client && npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Neil-liu7/vibe-workflow.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/Neil-liu7/vibe-workflow/issues"
+  },
+  "homepage": "https://github.com/Neil-liu7/vibe-workflow#readme",
+  "description": "MCP server for custom workflow",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.18.0",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@modelcontextprotocol/inspector": "^0.16.6",
+    "@types/node": "^24.3.1",
+    "concurrently": "^9.2.1",
+    "rimraf": "^6.0.1",
+    "typescript": "^5.9.2"
+  }
+}
