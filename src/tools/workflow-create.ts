@@ -2,13 +2,13 @@ import { server } from '../server.js';
 import { GetPromptResult } from "@modelcontextprotocol/sdk/types.js";
 import { z } from "zod";
 
-export function workflowCreate(projectPath: string) {
+export function workflowCreate() {
     server.prompt(
         'workflow-create',
-        'Summarize the context and save the workflow definition in Json format.',
+        'Interactive workflow creation assistant.',
         {
-            name: z.string().describe('The name of the workflow to create'),
-            context: z.string().describe('The description of the workflow to generate, or a dialogue history to provide descriptive context for the workflow.'),
+            name: z.string().describe('The name of the workflow to create (kebab-case)'),
+            context: z.string().describe('Description of what the workflow should accomplish, or dialogue history for context.'),
         },
         async ({ name, context }): Promise<GetPromptResult> => {
             return {
@@ -17,23 +17,38 @@ export function workflowCreate(projectPath: string) {
                         role: 'user',
                         content: {
                             type: 'text',
-                            text: `Get interactive guidance for creating a '${name}' workflow.
+                            text: `Create a workflow named '${name}' based on the following context:
 
 **Context:**
 ${context}
 
 **Instructions:**
-1. Use the workflow-define tool to get comprehensive workflow definitions
-2. Review the current context and the content to summarize the workflow steps
-3. Print the workflow definition in Json format, ALWAYS ask for confirmation before using the workflow-save tool
-4. Use the workflow-save tool to save the workflow definition
+1. First, use the workflow-define tool to understand the workflow format
+2. Analyze the context to identify the sequence of steps needed
+3. Design the workflow with appropriate step types:
+   - **prompt** steps for AI processing, validation, transformation
+   - **mcp** steps for tool calls (database, API, file operations)  
+   - **workflow** steps for reusable sub-workflows
+4. Create a JSON workflow definition
+5. Ask for user confirmation before saving
+6. Use workflow-save to save the workflow
 
-**Resrictions:**
-- Do not make up steps that are not in the context
-- Do not include any steps that are not relevant to the context
-- Ensure the Json is properly formatted
-- Use only the workflow-save tools to save the workflow
-`,
+**Design Guidelines:**
+- Keep steps focused and single-purpose
+- Use descriptive names and clear descriptions
+- Include expectedOutputs for prompt steps
+- Use template variables like {{fieldName}} for data flow
+- Consider reusability - break complex logic into sub-workflows
+
+**Context Analysis:**
+Based on the provided context, identify:
+- What inputs are needed?
+- What processing steps are required?
+- What outputs should be generated?
+- Are there any validation or error handling needs?
+- Can any parts be reused as sub-workflows?
+
+Start by using workflow-define to get the format, then create the workflow definition.`,
                         },
                     },
                 ],

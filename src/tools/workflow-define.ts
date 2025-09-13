@@ -1,117 +1,117 @@
 import { server } from '../server.js';
 import { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
-import { z } from "zod";
 
 export function workflowDefine() {
     server.tool(
         'workflow-define',
         'Provides definitions for creating a workflow',
         {},
-        async ({ }): Promise<CallToolResult> => {
+        async (): Promise<CallToolResult> => {
             return {
                 content: [
                     {
                         type: "text",
-                        text: `# Workflow
+                        text: `# Workflow System
 
 ## Overview
-
-A Workflow is a series of steps that are executed in order.
-Workflow must have a name using kebab-case (e.g., user-authentication), so that Workflow can be referenced as a step in other Workflows.
-Workflow must have at least one step.
-Each step must define inputs and.
-Each step must include a description that explains how the step transforms its inputs into its outputs.
-The Final step's outputs are the outputs of the Workflow.
-Inputs and Outputs of a Step must be a valid json format.
-
-Each step can be a single prompt or a MCP tool or a sub-workflow.
-Steps can only use at most ONE MCP tool, keep the Step Simple.
-Workflow can be nested, but a Workflow CANNOT call itself recursively.
-
-## Inputs/Outpus Definition
-Inputs/Outpus are key-value pairs, where key is the name, value is the type.
-Input/Output types are defined as follows:
-- string
-- number
-- boolean
-- object
-- array
+A Workflow is a sequence of steps executed by AI with data flowing between steps.
+Workflows are flattened during execution - nested workflows are expanded inline.
+Each step is executed by the AI with flexible prompt-based processing.
 
 ## Workflow Definition
-Workflow definition is a json file, which contains the following fields:
-- name: string, required, kebab-case, (e.g. 'user-authentication').
-- desc: string, required, a brief description of the workflow process.
-- steps: array, required, at least one step.
-- inputs: object, required, must match the inputs of the first step
-- outputs: object, required, must match the outputs of the final step
+Workflows are JSON files stored in \`.workflow/\` directory with \`.json\` extension.
 
-### Step Definition
-Each step is a json object, different step types have different fields.
+### Required Fields
+- **name**: string, kebab-case (e.g., "user-authentication")
+- **description**: string, what this workflow accomplishes
+- **steps**: array, at least one step
 
-#### Prompt Step
-Prompt step takes a prompt template, replace the placeholders with the input values, and use the MCP tool 'workflow-run-step' to return the result.
-- type: string, 'prompt'
-- template: string, the prompt template, must contain placeholders in the format {{placeholder}} , and explain how to generate its outputs.
-- inputs: object, required, must match the placeholders in the prompt template.
-- outputs: object, required, must match the outputs defined in the prompt template.
+### Optional Fields  
+- **expectedOutputs**: array of strings, final output field names
+- **initialInputs**: object, expected input structure (for documentation)
 
-#### MCP Step
-MCP step uses a MCP tool to process the inputs and return the outputs.
-- type: string, 'mcp'
-- tool: string, required, must be a valid MCP tool name
-- inputs: object, required, must match the inputs of the MCP tool
-- outputs: object, required, must match the outputs of the MCP tool
+## Step Types
 
-#### Sub-workflow Step
-Sub-workflow step calls another workflow to process the inputs and return the outputs.
-- type: string, 'workflow'
-- workflow: string, required, must be a valid workflow name
-- inputs: object, required, must match the inputs of the sub-workflow
-- outputs: object, required, must match the outputs of the sub-workflow
+### Prompt Step (Flexible AI Processing)
+\`\`\`json
+{
+  "type": "prompt",
+  "description": "What this step accomplishes",
+  "template": "Process {{input}} and generate {{expectedOutput}}",
+  "expectedOutputs": ["field1", "field2"],
+  "hints": "Additional guidance for AI"
+}
+\`\`\`
 
-## Example
+### MCP Step (Tool Call)
+\`\`\`json
+{
+  "type": "mcp", 
+  "tool": "tool-name",
+  "description": "What this tool does",
+  "inputMapping": {
+    "toolParam": "{{dataField}}"
+  }
+}
+\`\`\`
+
+### Workflow Step (Sub-workflow - Gets Flattened)
+\`\`\`json
+{
+  "type": "workflow",
+  "workflow": "sub-workflow-name", 
+  "description": "What the sub-workflow does"
+}
+\`\`\`
+
+## Example Workflow
 
 \`\`\`json
 {
-  "name": "user-authentication",
-  "desc": "Authenticate user with email and password",
-  "inputs": {
-    "email": "string",
-    "password": "string"
-  },
-  "outputs": {
-    "success": "boolean",
-    "token": "string",
-    "user": "object"
-  },
+  "name": "user-registration",
+  "description": "Register a new user with validation",
+  "expectedOutputs": ["userId", "success", "message"],
   "steps": [
     {
       "type": "prompt",
-      "template": "Validate email format: {{email}}. Return {valid: boolean, message: string}",
-      "inputs": {
-        "email": "string"
-      },
-      "outputs": {
-        "valid": "boolean",
-        "message": "string"
-      }
+      "description": "Validate and normalize user input",
+      "template": "Validate email {{email}} and name {{fullName}}. Check format and extract firstName/lastName.",
+      "expectedOutputs": ["isValid", "email", "firstName", "lastName", "errors"],
+      "hints": "Email must be in valid format, names should be trimmed and capitalized"
+    },
+    {
+      "type": "workflow", 
+      "workflow": "password-security-check",
+      "description": "Validate password strength"
     },
     {
       "type": "mcp",
-      "tool": "database-query",
-      "inputs": {
-        "email": "string",
-        "password": "string"
-      },
-      "outputs": {
-        "success": "boolean",
-        "token": "string",
-        "user": "object"
+      "tool": "database-insert",
+      "description": "Save user to database",
+      "inputMapping": {
+        "email": "{{email}}",
+        "firstName": "{{firstName}}",
+        "lastName": "{{lastName}}",
+        "passwordHash": "{{passwordHash}}"
       }
+    },
+    {
+      "type": "prompt",
+      "description": "Generate welcome message and final response",
+      "template": "Create welcome message for {{firstName}} and format final response with userId {{userId}}",
+      "expectedOutputs": ["message", "success"]
     }
   ]
 }
 \`\`\`
+
+## Key Concepts
+
+1. **Flattening**: Sub-workflows are expanded inline during execution
+2. **Data Flow**: Each step receives all previous data and adds new fields
+3. **Flexible Prompts**: AI interprets templates and generates appropriate outputs
+4. **Template Variables**: Use {{fieldName}} to reference data from previous steps
+5. **No Rigid Schemas**: Prompt steps use natural language descriptions instead of strict types
 `
                     },
                 ],
