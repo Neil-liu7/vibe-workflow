@@ -1,0 +1,50 @@
+[
+  {
+    "name": "gen_podcast_script",
+    "totalCalls": 7,
+    "successCalls": 7,
+    "failedCalls": 0,
+    "firstUsed": "2025-09-13T05:45:46.078Z",
+    "dailyUsage": {
+      "2025-09-13": 7
+    },
+    "lastUsed": "2025-09-13T05:46:06.860Z",
+    "avgResponseTime": 0
+  },
+  {
+    "name": "gen_knowledge_card_html",
+    "totalCalls": 2,
+    "successCalls": 2,
+    "failedCalls": 0,
+    "firstUsed": "2025-09-13T05:46:01.667Z",
+    "dailyUsage": {
+      "2025-09-13": 2
+    },
+    "lastUsed": "2025-09-13T05:46:01.789Z",
+    "avgResponseTime": 0
+  },
+  {
+    "name": "gen_bento_grid_html",
+    "totalCalls": 3,
+    "successCalls": 3,
+    "failedCalls": 0,
+    "firstUsed": "2025-09-13T05:46:03.814Z",
+    "dailyUsage": {
+      "2025-09-13": 3
+    },
+    "lastUsed": "2025-09-13T05:46:04.181Z",
+    "avgResponseTime": 0
+  },
+  {
+    "name": "gen_magazine_card_html",
+    "totalCalls": 17,
+    "successCalls": 17,
+    "failedCalls": 0,
+    "firstUsed": "2025-09-13T05:46:09.466Z",
+    "dailyUsage": {
+      "2025-09-13": 17
+    },
+    "lastUsed": "2025-09-13T05:46:52.196Z",
+    "avgResponseTime": 0.058823529411764705
+  }
+]

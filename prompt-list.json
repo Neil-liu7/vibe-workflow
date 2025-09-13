@@ -1,0 +1,48 @@
+{
+  "lastUpdated": "2025-09-13T05:46:12.903Z",
+  "totalCount": 6,
+  "prompts": [
+    {
+      "name": "gen_3d_webpage_html",
+      "description": "3D网页展示生成器",
+      "argumentCount": 0,
+      "filePath": "/Users/neilliu/Desktop/vibe-contest/work-flow-mcp/prompts/gen_3d_webpage_html.yaml",
+      "createdAt": "2025-09-13T03:10:30.631Z"
+    },
+    {
+      "name": "gen_bento_grid_html",
+      "description": "Bento Grid风格单页网站生成器",
+      "argumentCount": 0,
+      "filePath": "/Users/neilliu/Desktop/vibe-contest/work-flow-mcp/prompts/gen_bento_grid_html.yaml",
+      "createdAt": "2025-09-13T03:30:05.222Z"
+    },
+    {
+      "name": "gen_knowledge_card_html",
+      "description": "从复杂文本中提炼20个金句，并为每个金句生成2种不同风格的知识卡片HTML，适合社交媒体、自媒体和在线学习内容，风格多元、视觉冲击力强。",
+      "argumentCount": 0,
+      "filePath": "/Users/neilliu/Desktop/vibe-contest/work-flow-mcp/prompts/gen_knowledge_card_html.yaml",
+      "createdAt": "2025-09-13T05:16:28.583Z"
+    },
+    {
+      "name": "gen_magazine_card_html",
+      "description": "从内容中提炼核心信息，随机选择1种顶级杂志风格，生成奢华、精致、极具视觉冲击力的数字杂志知识卡片，适合高端内容传播和收藏。",
+      "argumentCount": 0,
+      "filePath": "/Users/neilliu/Desktop/vibe-contest/work-flow-mcp/prompts/gen_magazine_card_html.yaml",
+      "createdAt": "2025-09-13T05:16:35.789Z"
+    },
+    {
+      "name": "gen_podcast_script",
+      "description": "将任意主题或内容转化为一段高质量的中文播客对话脚本，风格深度、真诚、全球视野与中国洞察兼具，完全模拟Lex Fridman播客的主持风格。",
+      "argumentCount": 0,
+      "filePath": "/Users/neilliu/Desktop/vibe-contest/work-flow-mcp/prompts/gen_podcast_script.yaml",
+      "createdAt": "2025-09-13T05:16:42.610Z"
+    },
+    {
+      "name": "gen_prd_prototype_html",
+      "description": "产品需求文档(PRD)与高保真原型设计生成器",
+      "argumentCount": 0,
+      "filePath": "/Users/neilliu/Desktop/vibe-contest/work-flow-mcp/prompts/gen_prd_prototype_html.yaml",
+      "createdAt": "2025-09-13T03:30:58.241Z"
+    }
+  ]
+}
