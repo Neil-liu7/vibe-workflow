@@ -1,8 +1,11 @@
+#!/usr/bin/env node
+
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { homedir } from 'os';
+import { join } from 'path';
 import { server } from './server.js';
 
-import { validateProjectPath } from './path-utils.js';
+import { ensureDirectoryExists, validateProjectPath } from './path-utils.js';
 import { workflowCreate } from "./tools/workflow-create.js";
 import { workflowDefine } from "./tools/workflow-define.js";
 import { workflowExecute } from "./tools/workflow-execute.js";
@@ -20,6 +23,9 @@ function expandTildePath(path: string): string {
 async function registerTools(projectPath: string) {
   // Validate project path
   await validateProjectPath(projectPath);
+
+  await ensureDirectoryExists(join(projectPath, '.workflow'))
+
   // Register implemented tools
   workflowDefine();
   workflowCreate();
@@ -59,4 +65,10 @@ async function main() {
   }
 }
 
-main().catch(() => process.exit(1));
+main().catch((error) => {
+  console.error('Fatal error:', error);
+  if (error instanceof Error) {
+    console.error('Stack trace:', error.stack);
+  }
+  process.exit(1);
+});
