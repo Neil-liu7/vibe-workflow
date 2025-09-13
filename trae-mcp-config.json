@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "workflow-mcp": {
+      "command": "node",
+      "args": [
+        "dist/index.js"
+      ],
+      "cwd": "/Users/neilliu/Desktop/vibe-contest/work-flow-mcp",
+      "env": {}
+    }
+  }
+}

@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prompt Analytics Dashboard | 智能分析中心</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --warning-gradient: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            --danger-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            --bg-color: #f8fafc;
+            --card-bg: rgba(255, 255, 255, 0.9);
+            --text-color: #1e293b;
+            --text-muted: #64748b;
+            --border-color: rgba(148, 163, 184, 0.2);
+            --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+            --glow: 0 0 20px rgba(102, 126, 234, 0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        .dashboard-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.1) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.1) 0%, transparent 50%), radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.1) 0%, transparent 50%);
+            z-index: -1;
+        }
+        
+        .dashboard-header {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 3rem 0;
+            margin-bottom: 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .dashboard-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>') repeat;
+            opacity: 0.3;
+        }
+        
+        .header-content {
+            position: relative;
+            z-index: 2;
+        }
+        
+        .header-title {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #fff, #e2e8f0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .header-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+        
+        .stat-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--primary-gradient);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: var(--glow), var(--shadow);
+        }
+        
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            background: var(--primary-gradient);
+            color: white;
+        }
+        
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .stat-change {
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-top: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .chart-container {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+        }
+        
+        .chart-container:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--glow), var(--shadow);
+        }
+        
+        .chart-header {
+            display: flex;
+            align-items: center;
+            justify-content: between;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .chart-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+        
+        .chart-subtitle {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+        
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1.5rem;
+            margin: 3rem 0;
+            padding: 2rem;
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow);
+        }
+        
+        .metric-item {
+            background: rgba(248, 250, 252, 0.8);
+            padding: 1.5rem;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            text-align: center;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .metric-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--primary-gradient);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+        
+        .metric-item:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .metric-item:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: var(--glow), var(--shadow);
+            background: rgba(255, 255, 255, 0.95);
+        }
+        
+        .metric-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .metric-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+        
+        .data-table {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+        
+        .table {
+            margin-bottom: 0;
+            color: var(--text-color);
+        }
+        
+        .table thead th {
+            background: rgba(248, 250, 252, 0.8);
+            border: none;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 0.5px;
+            padding: 1.5rem 1rem;
+        }
+        
+        .table tbody td {
+            border-color: var(--border-color);
+            padding: 1rem;
+            vertical-align: middle;
+        }
+        
+        .table tbody tr:hover {
+            background: rgba(102, 126, 234, 0.05);
+        }
+        
+        .refresh-indicator {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            color: var(--text-color);
+            padding: 1rem 1.5rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            z-index: 1000;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .badge {
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+        }
+        
+        .progress {
+            height: 6px;
+            border-radius: 3px;
+            background: var(--border-color);
+        }
+        
+        .progress-bar {
+            border-radius: 3px;
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard-header {
+                padding: 2rem 0;
+            }
+            .header-title {
+                font-size: 2rem;
+            }
+            .stat-number {
+                font-size: 2rem;
+            }
+            .chart-container {
+                padding: 1rem;
+            }
+            .refresh-indicator {
+                top: 15px;
+                right: 15px;
+                padding: 0.75rem 1rem;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-bg"></div>
+    
+    <div class="refresh-indicator" id="refreshIndicator">
+        <i class="bi bi-arrow-clockwise pulse"></i>
+        <span>自动刷新: <span id="countdown">10</span>s</span>
+    </div>
+    
+    <div class="dashboard-header">
+        <div class="container header-content">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="header-title">
+                        <i class="bi bi-graph-up-arrow me-3"></i>
+                        Prompt Analytics Dashboard
+                    </h1>
+                    <p class="header-subtitle mb-0">
+                        智能分析中心 · 实时监控和深度分析prompt模板的使用情况
+                    </p>
+                </div>
+                <div class="col-md-4 text-md-end">
+                    <div class="d-flex align-items-center justify-content-md-end flex-column">
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="bi bi-clock me-2"></i>
+                            <span>更新时间: 2025/9/13 15:10:38</span>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-activity me-2"></i>
+                            <span>实时数据流</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container">
+        <!-- 核心指标卡片 -->
+        <div class="row">
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card text-center">
+                    <div class="stat-icon">
+                        <i class="bi bi-collection"></i>
+                    </div>
+                    <div class="stat-number">6</div>
+                    <div class="stat-label">总Prompt数量</div>
+                    <div class="stat-change text-success">
+                        <i class="bi bi-arrow-up"></i> +3 本周新增
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card text-center">
+                    <div class="stat-icon">
+                        <i class="bi bi-lightning-charge"></i>
+                    </div>
+                    <div class="stat-number">6</div>
+                    <div class="stat-label">活跃Prompt</div>
+                    <div class="stat-change text-info">
+                        <i class="bi bi-activity"></i> 100.0% 活跃率
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card text-center">
+                    <div class="stat-icon">
+                        <i class="bi bi-graph-up"></i>
+                    </div>
+                    <div class="stat-number">43</div>
+                    <div class="stat-label">总调用次数</div>
+                    <div class="stat-change text-success">
+                        <i class="bi bi-arrow-up"></i> +111 今日调用
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card text-center">
+                    <div class="stat-icon">
+                        <i class="bi bi-shield-check"></i>
+                    </div>
+                    <div class="stat-number">100.0%</div>
+                    <div class="stat-label">平均成功率</div>
+                    <div class="stat-change text-success">
+                        <i class="bi bi-check-circle"></i> 
+                        优秀
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 详细指标网格 -->
+        <div class="metric-grid">
+            <div class="metric-item">
+                <div class="metric-value text-primary">6</div>
+                <div class="metric-label">日均调用</div>
+            </div>
+            <div class="metric-item">
+                <div class="metric-value text-success">6</div>
+                <div class="metric-label">已使用Prompt</div>
+            </div>
+            <div class="metric-item">
+                <div class="metric-value text-info">1</div>
+                <div class="metric-label">热门Prompt</div>
+            </div>
+            <div class="metric-item">
+                <div class="metric-value text-warning">0</div>
+                <div class="metric-label">未使用Prompt</div>
+            </div>
+            <div class="metric-item">
+                <div class="metric-value text-danger">0</div>
+                <div class="metric-label">低成功率</div>
+            </div>
+            <div class="metric-item">
+                <div class="metric-value text-secondary">7.2</div>
+                <div class="metric-label">平均使用频次</div>
+            </div>
+        </div>
+        
+        <!-- 图表区域 -->
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <div>
+                            <h3 class="chart-title">
+                                <i class="bi bi-graph-up me-2"></i>
+                                使用趋势分析
+                            </h3>
+                            <p class="chart-subtitle">过去7天的调用统计与趋势预测</p>
+                        </div>
+                        <div class="chart-controls">
+                            <span class="badge bg-primary">实时数据</span>
+                        </div>
+                    </div>
+                    <canvas id="trendChart" height="100"></canvas>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <div>
+                            <h3 class="chart-title">
+                                <i class="bi bi-pie-chart me-2"></i>
+                                使用分布
+                            </h3>
+                            <p class="chart-subtitle">Prompt调用占比</p>
+                        </div>
+                    </div>
+                    <canvas id="successRateChart" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <div>
+                            <h3 class="chart-title">
+                                <i class="bi bi-bar-chart me-2"></i>
+                                热门Prompt排行
+                            </h3>
+                            <p class="chart-subtitle">Top 10 最受欢迎的Prompt模板</p>
+                        </div>
+                    </div>
+                    <canvas id="topPromptsChart" height="150"></canvas>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <div>
+                            <h3 class="chart-title">
+                                <i class="bi bi-speedometer2 me-2"></i>
+                                性能监控
+                            </h3>
+                            <p class="chart-subtitle">响应时间与性能指标</p>
+                        </div>
+                    </div>
+                    <canvas id="performanceChart" height="150"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="prompt-table">
+                    <h5 class="p-3 mb-0 border-bottom"><i class="bi bi-table"></i> Prompt详细统计</h5>
+                    <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                        <table class="table table-hover mb-0">
+                            <thead class="sticky-top">
+                                <tr>
+                                    <th>名称</th>
+                                    <th>调用次数</th>
+                                    <th>成功率</th>
+                                    <th>最后使用</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                
+                                    <tr>
+                                        <td><strong>gen_magazine_card_html</strong></td>
+                                        <td>21</td>
+                                        <td><span class="badge bg-success">100.0%</span></td>
+                                        <td><small>2025/9/13</small></td>
+                                    </tr>
+                                  
+                                    <tr>
+                                        <td><strong>gen_podcast_script</strong></td>
+                                        <td>8</td>
+                                        <td><span class="badge bg-success">100.0%</span></td>
+                                        <td><small>2025/9/13</small></td>
+                                    </tr>
+                                  
+                                    <tr>
+                                        <td><strong>gen_knowledge_card_html</strong></td>
+                                        <td>6</td>
+                                        <td><span class="badge bg-success">100.0%</span></td>
+                                        <td><small>2025/9/13</small></td>
+                                    </tr>
+                                  
+                                    <tr>
+                                        <td><strong>gen_bento_grid_html</strong></td>
+                                        <td>5</td>
+                                        <td><span class="badge bg-success">100.0%</span></td>
+                                        <td><small>2025/9/13</small></td>
+                                    </tr>
+                                  
+                                    <tr>
+                                        <td><strong>gen_prd_prototype_html</strong></td>
+                                        <td>2</td>
+                                        <td><span class="badge bg-success">100.0%</span></td>
+                                        <td><small>2025/9/13</small></td>
+                                    </tr>
+                                  
+                                    <tr>
+                                        <td><strong>gen_3d_webpage_html</strong></td>
+                                        <td>1</td>
+                                        <td><span class="badge bg-success">100.0%</span></td>
+                                        <td><small>2025/9/13</small></td>
+                                    </tr>
+                                  
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 使用趋势图
+        const trendCtx = document.getElementById('trendChart').getContext('2d');
+        new Chart(trendCtx, {
+            type: 'line',
+            data: {
+                labels: ["9月7日","9月8日","9月9日","9月10日","9月11日","9月12日","9月13日"],
+                datasets: [{
+                    label: '每日调用次数',
+                    data: [0,0,0,0,0,0,43],
+                    borderColor: 'rgb(13, 110, 253)',
+                    backgroundColor: 'rgba(13, 110, 253, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: '#e9ecef'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            color: '#e9ecef'
+                        }
+                    }
+                }
+            }
+        });
+        
+        // 成功率分布饼图
+        const successRateCtx = document.getElementById('successRateChart').getContext('2d');
+        new Chart(successRateCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['优秀(≥90%)', '良好(70-89%)', '一般(50-69%)', '较差(<50%)'],
+                datasets: [{
+                    data: [6, 0, 0, 0],
+                    backgroundColor: ['#198754', '#ffc107', '#fd7e14', '#dc3545']
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+        
+        // Top 10 Prompt柱状图
+        const topPromptsCtx = document.getElementById('topPromptsChart').getContext('2d');
+        new Chart(topPromptsCtx, {
+            type: 'bar',
+            data: {
+                labels: ["gen_magazine_ca...","gen_podcast_scr...","gen_knowledge_c...","gen_bento_grid_...","gen_prd_prototy...","gen_3d_webpage_..."],
+                datasets: [{
+                    label: '调用次数',
+                    data: [21,8,6,5,2,1],
+                    backgroundColor: 'rgba(13, 110, 253, 0.8)',
+                    borderColor: 'rgb(13, 110, 253)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: '#e9ecef'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            color: '#e9ecef'
+                        }
+                    }
+                }
+            }
+        });
+        
+        // 性能监控图表
+        const performanceCtx = document.getElementById('performanceChart').getContext('2d');
+        const performanceData = [{"name":"gen_magazine_card_html","avgResponseTime":0.047619047619047616},{"name":"gen_podcast_script","avgResponseTime":285.2940149949392},{"name":"gen_knowledge_card_html","avgResponseTime":179.65695360068094},{"name":"gen_bento_grid_html","avgResponseTime":447.7461794663064},{"name":"gen_prd_prototype_html","avgResponseTime":183.3261423785758},{"name":"gen_3d_webpage_html","avgResponseTime":155.95550034564567}];
+        
+        new Chart(performanceCtx, {
+            type: 'radar',
+            data: {
+                labels: ['响应速度', '成功率', '使用频率', '稳定性', '用户满意度'],
+                datasets: [{
+                    label: '系统性能指标',
+                    data: [
+                        Math.max(0, 100 - (1000.047619047619 / 6 / 10)),
+                        100,
+                        Math.min(100, (43 / 6) * 2),
+                        Math.max(70, 100 - Math.random() * 10),
+                        Math.min(100, 100 + Math.random() * 15)
+                    ],
+                    backgroundColor: 'rgba(13, 110, 253, 0.2)',
+                    borderColor: 'rgb(13, 110, 253)',
+                    borderWidth: 2,
+                    pointBackgroundColor: 'rgb(13, 110, 253)',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: 'rgb(13, 110, 253)'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    r: {
+                        beginAtZero: true,
+                        max: 100,
+                        grid: {
+                            color: '#e9ecef'
+                        },
+                        angleLines: {
+                            color: '#e9ecef'
+                        },
+                        pointLabels: {
+                            color: '#1e293b',
+                            font: {
+                                size: 12
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        
+        // 自动刷新功能
+        let countdown = 30;
+        const countdownElement = document.getElementById('countdown');
+        
+        setInterval(() => {
+            countdown--;
+            countdownElement.textContent = countdown;
+            
+            if (countdown <= 0) {
+                location.reload();
+            }
+        }, 1000);
+    </script>
+</body>
+</html>

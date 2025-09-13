@@ -1,50 +1,74 @@
 [
   {
     "name": "gen_podcast_script",
-    "totalCalls": 7,
-    "successCalls": 7,
+    "totalCalls": 8,
+    "successCalls": 8,
     "failedCalls": 0,
     "firstUsed": "2025-09-13T05:45:46.078Z",
     "dailyUsage": {
-      "2025-09-13": 7
+      "2025-09-13": 8
     },
-    "lastUsed": "2025-09-13T05:46:06.860Z",
+    "lastUsed": "2025-09-13T05:59:00.986Z",
     "avgResponseTime": 0
   },
   {
     "name": "gen_knowledge_card_html",
-    "totalCalls": 2,
-    "successCalls": 2,
+    "totalCalls": 6,
+    "successCalls": 6,
     "failedCalls": 0,
     "firstUsed": "2025-09-13T05:46:01.667Z",
     "dailyUsage": {
-      "2025-09-13": 2
+      "2025-09-13": 6
     },
-    "lastUsed": "2025-09-13T05:46:01.789Z",
+    "lastUsed": "2025-09-13T06:04:42.609Z",
     "avgResponseTime": 0
   },
   {
     "name": "gen_bento_grid_html",
-    "totalCalls": 3,
-    "successCalls": 3,
+    "totalCalls": 5,
+    "successCalls": 5,
     "failedCalls": 0,
     "firstUsed": "2025-09-13T05:46:03.814Z",
     "dailyUsage": {
-      "2025-09-13": 3
+      "2025-09-13": 5
     },
-    "lastUsed": "2025-09-13T05:46:04.181Z",
+    "lastUsed": "2025-09-13T05:58:55.275Z",
     "avgResponseTime": 0
   },
   {
     "name": "gen_magazine_card_html",
-    "totalCalls": 17,
-    "successCalls": 17,
+    "totalCalls": 21,
+    "successCalls": 21,
     "failedCalls": 0,
     "firstUsed": "2025-09-13T05:46:09.466Z",
     "dailyUsage": {
-      "2025-09-13": 17
+      "2025-09-13": 21
     },
-    "lastUsed": "2025-09-13T05:46:52.196Z",
-    "avgResponseTime": 0.058823529411764705
+    "lastUsed": "2025-09-13T06:04:45.128Z",
+    "avgResponseTime": 0.047619047619047616
+  },
+  {
+    "name": "gen_3d_webpage_html",
+    "totalCalls": 1,
+    "successCalls": 1,
+    "failedCalls": 0,
+    "firstUsed": "2025-09-13T05:58:53.384Z",
+    "dailyUsage": {
+      "2025-09-13": 1
+    },
+    "lastUsed": "2025-09-13T05:58:53.384Z",
+    "avgResponseTime": 0
+  },
+  {
+    "name": "gen_prd_prototype_html",
+    "totalCalls": 2,
+    "successCalls": 2,
+    "failedCalls": 0,
+    "firstUsed": "2025-09-13T06:04:47.312Z",
+    "dailyUsage": {
+      "2025-09-13": 2
+    },
+    "lastUsed": "2025-09-13T06:04:47.535Z",
+    "avgResponseTime": 0
   }
 ]
