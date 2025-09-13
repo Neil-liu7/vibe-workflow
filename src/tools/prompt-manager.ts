@@ -91,6 +91,13 @@ export class PromptManager {
 
 
   /**
+   * 获取prompts目录路径
+   */
+  getPromptsDir(): string {
+    return this.promptsDir;
+  }
+
+  /**
    * 获取prompt列表
    */
   getPromptList(): PromptListItem[] {
@@ -292,112 +299,63 @@ export async function registerPromptTools(projectPath: string) {
     ); 
   });
 
-  // 加载prompts
+  // 添加prompt列表工具
   server.tool(
-    'load_prompts',
-    '重新加载所有预设的prompts',
+    'prompt_list',
+    '展示所有可用的prompt模版工具方法',
     {},
     async () => {
-      const prompts = await promptManager.loadPrompts();
-      return {
-        content: [
-          {
-            type: 'text',
-            text: `成功加载了 ${prompts.length} 个prompts。`
-          }
-        ]
-      };
-    }
-  );
+      const jsonFilePath = join(dirname(promptManager.getPromptsDir()), 'prompt-list.json');
+      
+      try {
+        // 每次都从prompts文件夹重新扫描YAML文件
+        await promptManager.loadPrompts();
+        const promptList = promptManager.getPromptList();
+        
+        // 将最新的prompt信息保存到JSON文件
+        const jsonData = {
+          lastUpdated: new Date().toISOString(),
+          totalCount: promptList.length,
+          prompts: promptList
+        };
+        writeFileSync(jsonFilePath, JSON.stringify(jsonData, null, 2), 'utf8');
+        
+        if (promptList.length === 0) {
+          return {
+            content: [
+              {
+                type: 'text',
+                text: '当前没有可用的prompt模版工具。'
+              }
+            ]
+          };
+        }
 
-  // 获取prompt列表
-  server.tool(
-    'list_prompts',
-    '获取所有可用的prompt名称和描述',
-    {},
-    async () => {
-      await promptManager.loadPrompts();
-      const promptList = promptManager.getPromptList();
-      const promptNames = promptList.map(p => `- ${p.name}: ${p.description || '无描述'} (${p.argumentCount}个参数)`);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: `可用的prompts (${promptList.length}):\n${promptNames.join('\n')}`
-          }
-        ]
-      };
-    }
-  );
+        const promptInfo = promptList.map(prompt => {
+          const args = prompt.argumentCount > 0 ? ` (${prompt.argumentCount}个参数)` : ' (无参数)';
+          return `🔧 **${prompt.name}**${args}\n   📝 ${prompt.description || '无描述'}\n   📁 ${prompt.filePath}`;
+        }).join('\n\n');
 
-  // 获取prompt详情
-  server.tool(
-    'get_prompt',
-    '获取指定prompt的详细信息',
-    {
-      name: z.string().describe('Prompt名称')
-    },
-    async (args) => {
-      await promptManager.loadPrompts();
-      const prompt = promptManager.getPrompt(args.name);
-      if (!prompt) {
         return {
           content: [
             {
               type: 'text',
-              text: `未找到名为 '${args.name}' 的prompt。`
+              text: `## 可用的Prompt模版工具 (${promptList.length}个)\n\n${promptInfo}\n\n💡 **使用方法**: 直接调用对应的工具名称即可，例如调用 \`gen_3d_webpage_html\` 工具。\n\n📄 **JSON文件已更新**: ${jsonFilePath}\n🕒 **更新时间**: ${jsonData.lastUpdated}`
             }
           ]
         };
-      }
-
-      const argsList = Array.isArray(prompt.arguments)
-        ? prompt.arguments.map(arg =>
-          `- ${arg.name} (${arg.type || 'string'}): ${arg.description || '无描述'}`
-        ).join('\n') : '无参数';
-
-      return {
-        content: [
-          {
-            type: 'text',
-            text: `Prompt: ${prompt.name}\n描述: ${prompt.description || '无描述'}\n参数:\n${argsList}\n\n内容预览:\n${prompt.messages[0]?.content?.text?.substring(0, 200) || ''}...`
-          }
-        ]
-      };
-    }
-  );
-
-  // 执行prompt
-  server.tool(
-    'execute_prompt',
-    '执行指定的prompt，支持参数替换',
-    {
-      name: z.string().describe('Prompt名称'),
-      arguments: z.record(z.any()).optional().describe('Prompt参数，键值对格式')
-    },
-    async (args) => {
-      await promptManager.loadPrompts();
-      const result = promptManager.executePrompt(args.name, args.arguments || {});
-
-      if (!result.success) {
+      } catch (error) {
         return {
           content: [
             {
               type: 'text',
-              text: `执行失败: ${result.error}`
+              text: `❌ 扫描prompt文件夹时出错: ${error instanceof Error ? error.message : '未知错误'}`
             }
           ]
         };
       }
-
-      return {
-        content: [
-          {
-            type: 'text',
-            text: result.content || ''
-          }
-        ]
-      };
     }
   );
+
+  // 注册完成，所有prompt都已转换为独立的工具方法
 }
