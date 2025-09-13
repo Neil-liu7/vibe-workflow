@@ -1,0 +1,40 @@
+{
+  "name": "code-review-workflow",
+  "description": "Automated code review workflow with multiple analysis steps",
+  "expectedOutputs": ["overallScore", "recommendations", "summary"],
+  "initialInputs": {
+    "codeContent": "string",
+    "language": "string",
+    "fileName": "string"
+  },
+  "steps": [
+    {
+      "type": "prompt",
+      "description": "Analyze code syntax and structure",
+      "template": "Analyze the {{language}} code in file {{fileName}}:\n\n{{codeContent}}\n\nCheck for syntax errors, code structure, and basic quality issues.",
+      "expectedOutputs": ["syntaxScore", "structureScore", "syntaxIssues"],
+      "hints": "Score from 1-10, list specific issues found"
+    },
+    {
+      "type": "prompt", 
+      "description": "Check security vulnerabilities",
+      "template": "Review the {{language}} code for security vulnerabilities:\n\n{{codeContent}}\n\nLook for common security issues like SQL injection, XSS, hardcoded secrets, etc.",
+      "expectedOutputs": ["securityScore", "vulnerabilities"],
+      "hints": "Score from 1-10, list specific security concerns"
+    },
+    {
+      "type": "prompt",
+      "description": "Evaluate performance and best practices",
+      "template": "Assess performance and best practices for this {{language}} code:\n\n{{codeContent}}\n\nConsider algorithmic efficiency, memory usage, and language-specific best practices.",
+      "expectedOutputs": ["performanceScore", "bestPracticesScore", "optimizations"],
+      "hints": "Provide scores 1-10 and specific optimization suggestions"
+    },
+    {
+      "type": "prompt",
+      "description": "Generate final review summary",
+      "template": "Create a comprehensive code review summary based on:\n- Syntax Score: {{syntaxScore}}\n- Structure Score: {{structureScore}}\n- Security Score: {{securityScore}}\n- Performance Score: {{performanceScore}}\n- Best Practices Score: {{bestPracticesScore}}\n\nIssues found:\n- Syntax: {{syntaxIssues}}\n- Security: {{vulnerabilities}}\n- Optimizations: {{optimizations}}",
+      "expectedOutputs": ["overallScore", "recommendations", "summary"],
+      "hints": "Calculate weighted average score, prioritize recommendations by severity"
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "name": "user-registration",
+  "description": "Complete user registration process with validation and welcome message",
+  "expectedOutputs": ["success", "userId", "message"],
+  "initialInputs": {
+    "email": "string",
+    "name": "string", 
+    "age": "number",
+    "password": "string"
+  },
+  "steps": [
+    {
+      "type": "workflow",
+      "workflow": "data-validation",
+      "description": "Validate user input data"
+    },
+    {
+      "type": "prompt",
+      "description": "Check password strength",
+      "template": "Validate password strength: {{password}}. Check length, complexity, and common patterns.",
+      "expectedOutputs": ["passwordValid", "passwordScore", "passwordErrors"],
+      "hints": "Password should be 8+ chars with mix of letters, numbers, symbols"
+    },
+    {
+      "type": "prompt",
+      "description": "Process registration if valid",
+      "template": "Process registration based on validation results:\n- Data valid: {{isValid}}\n- Password valid: {{passwordValid}}\n- Normalized data: {{normalizedData}}\n- All errors: {{errors}} + {{passwordErrors}}",
+      "expectedOutputs": ["success", "userId", "message"],
+      "hints": "Generate userId if successful, create appropriate success/error message"
+    }
+  ]
+}

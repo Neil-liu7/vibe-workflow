@@ -1,0 +1,40 @@
+{
+  "name": "data-validation",
+  "description": "Validates and normalizes user input data",
+  "expectedOutputs": ["isValid", "normalizedData", "errors"],
+  "initialInputs": {
+    "email": "string",
+    "name": "string",
+    "age": "number"
+  },
+  "steps": [
+    {
+      "type": "prompt",
+      "description": "Validate email format",
+      "template": "Validate email address: {{email}}. Check if it follows proper email format and extract domain.",
+      "expectedOutputs": ["emailValid", "emailDomain", "emailErrors"],
+      "hints": "Use standard email regex validation"
+    },
+    {
+      "type": "prompt",
+      "description": "Normalize and validate name",
+      "template": "Process name: {{name}}. Trim whitespace, capitalize properly, and validate length.",
+      "expectedOutputs": ["nameValid", "normalizedName", "nameErrors"],
+      "hints": "Names should be 2-50 characters, no special characters except hyphens and apostrophes"
+    },
+    {
+      "type": "prompt",
+      "description": "Validate age range",
+      "template": "Validate age: {{age}}. Check if it's a reasonable age for the application (13-120).",
+      "expectedOutputs": ["ageValid", "ageErrors"],
+      "hints": "Age must be numeric and within reasonable bounds"
+    },
+    {
+      "type": "prompt",
+      "description": "Compile validation results",
+      "template": "Compile final validation results:\n- Email valid: {{emailValid}}, errors: {{emailErrors}}\n- Name valid: {{nameValid}}, normalized: {{normalizedName}}, errors: {{nameErrors}}\n- Age valid: {{ageValid}}, errors: {{ageErrors}}",
+      "expectedOutputs": ["isValid", "normalizedData", "errors"],
+      "hints": "Overall valid only if all fields pass, combine all errors into single array"
+    }
+  ]
+}

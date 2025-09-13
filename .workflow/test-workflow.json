@@ -1,0 +1,28 @@
+{
+  "name": "test-workflow",
+  "description": "A simple test workflow to validate the MCP tool functionality",
+  "expectedOutputs": ["greeting", "timestamp", "fileCreated"],
+  "initialInputs": {
+    "userName": "string"
+  },
+  "steps": [
+    {
+      "type": "prompt",
+      "description": "Generate a personalized greeting",
+      "template": "Create a friendly greeting for user {{userName}} and include the current timestamp using command 'date'",
+      "expectedOutputs": ["greeting", "timestamp"],
+      "hints": "Make the greeting warm and professional, format timestamp as ISO string"
+    },
+    {
+      "type": "mcp",
+      "description": "Create a test.md file with the greeting",
+      "tool": "fsWrite",
+      "inputMapping": {
+        "path": "test.md",
+        "text": "# Test Workflow Output\n\n**User:** {{userName}}\n**Greeting:** {{greeting}}\n**Timestamp:** {{timestamp}}\n\nThis file was created by the test-workflow to validate MCP tool functionality."
+      },
+      "expectedOutputs": ["fileCreated"],
+      "hints": "Create a markdown file with the workflow results"
+    }
+  ]
+}
