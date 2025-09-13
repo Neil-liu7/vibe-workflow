@@ -60,40 +60,16 @@ export function workflowList(projectPath: string) {
                 // Sort workflows by name
                 workflows.sort((a, b) => a.name.localeCompare(b.name));
 
-                // Format the output
-                const output = [
-                    `📋 Available Workflows (${workflows.length} found)`,
-                    `Project: ${projectPath}`,
-                    `Directory: ${workflowDir}`,
-                    '',
-                    ...workflows.map(workflow => {
-                        if (workflow.error) {
-                            return `❌ ${workflow.name}\n   ${workflow.description}`;
-                        }
-
-                        const inputs = Object.keys(workflow.initialInputs).length > 0
-                            ? `\n   Inputs: ${Object.keys(workflow.initialInputs).join(', ')}`
-                            : '';
-
-                        const outputs = workflow.expectedOutputs.length > 0
-                            ? `\n   Outputs: ${workflow.expectedOutputs.join(', ')}`
-                            : '';
-
-                        return `🔄 ${workflow.name}${workflow.displayName !== workflow.name ? ` (${workflow.displayName})` : ''}
-   ${workflow.description}
-   Steps: ${workflow.stepCount}${inputs}${outputs}`;
-                    }),
-                    '',
-                    '💡 Usage:',
-                    '• Execute a workflow: workflow-execute <name>',
-                    '• Create new workflow: workflow-create',
-                    '• Save workflow: workflow-save <name> <content>'
-                ].join('\n');
+                // Format the output as JSON with only name and description
+                const workflowList = workflows.map(workflow => ({
+                    name: workflow.name,
+                    description: workflow.description
+                }));
 
                 return {
                     content: [{
                         type: "text",
-                        text: output
+                        text: JSON.stringify(workflowList, null, 2)
                     }]
                 };
 
