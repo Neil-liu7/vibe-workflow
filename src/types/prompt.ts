@@ -91,3 +91,45 @@ export interface PromptListItem {
   /** 标签 */
   tags?: string[];
 }
+
+/**
+ * Prompt使用统计接口
+ */
+export interface PromptUsageStats {
+  /** Prompt名称 */
+  name: string;
+  /** 总调用次数 */
+  totalCalls: number;
+  /** 成功调用次数 */
+  successCalls: number;
+  /** 失败调用次数 */
+  failedCalls: number;
+  /** 最近调用时间 */
+  lastUsed?: string;
+  /** 首次调用时间 */
+  firstUsed?: string;
+  /** 平均响应时间(毫秒) */
+  avgResponseTime?: number;
+  /** 使用频率(每天) */
+  dailyUsage: Record<string, number>;
+}
+
+/**
+ * 使用统计汇总接口
+ */
+export interface UsageStatsSummary {
+  /** 统计生成时间 */
+  generatedAt: string;
+  /** 总prompt数量 */
+  totalPrompts: number;
+  /** 活跃prompt数量(有使用记录) */
+  activePrompts: number;
+  /** 总调用次数 */
+  totalCalls: number;
+  /** 成功率 */
+  successRate: number;
+  /** 最受欢迎的prompt */
+  mostPopular?: string;
+  /** 各prompt的详细统计 */
+  promptStats: PromptUsageStats[];
+}
