@@ -234,8 +234,63 @@ export class PromptManager {
 /**
  * 注册prompt管理相关的工具
  */
-export function registerPromptTools(projectPath: string) {
+export async function registerPromptTools(projectPath: string) {
   const promptManager = new PromptManager(projectPath);
+
+  // 加载所有预设的prompts
+  const loadedPrompts = await promptManager.loadPrompts();
+
+  // 为每个预设的prompt创建一个工具 
+  loadedPrompts.forEach(prompt => { 
+    // 构建工具的输入schema 
+    const schemaObj: Record<string, any> = {}; 
+    
+    if (prompt.arguments && Array.isArray(prompt.arguments)) { 
+      prompt.arguments.forEach(arg => { 
+        // 默认所有参数都是字符串类型 
+        schemaObj[arg.name] = z.string().describe(arg.description || `参数: ${arg.name}`); 
+      }); 
+    } 
+    
+    // 注册工具 
+    server.tool( 
+      prompt.name, 
+      prompt.description || `Prompt: ${prompt.name}`, 
+      schemaObj, 
+      async (args: any) => { 
+        // 处理prompt内容 
+        let promptText = ''; 
+        
+        if (prompt.messages && Array.isArray(prompt.messages)) { 
+          // 只处理用户消息 
+          const userMessages = prompt.messages.filter(msg => msg.role === 'user'); 
+          
+          for (const message of userMessages) { 
+            if (message.content && typeof message.content.text === 'string') { 
+              let text = message.content.text; 
+              
+              // 替换所有 {{arg}} 格式的参数 
+              for (const [key, value] of Object.entries(args)) { 
+                text = text.replace(new RegExp(`{{${key}}}`, 'g'), String(value)); 
+              } 
+              
+              promptText += text + '\n\n'; 
+            } 
+          } 
+        } 
+        
+        // 返回处理后的prompt内容 
+        return { 
+          content: [ 
+            { 
+              type: "text", 
+              text: promptText.trim() 
+            } 
+          ] 
+        }; 
+      } 
+    ); 
+  });
 
   // 加载prompts
   server.tool(

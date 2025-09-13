@@ -26,7 +26,7 @@ async function registerTools(projectPath: string) {
   // TODO: Register tools when they are implemented
   workflowSave(projectPath);
   workflowRun(projectPath);
-  registerPromptTools(projectPath);
+  await registerPromptTools(projectPath);
 }
 
 async function main() {
