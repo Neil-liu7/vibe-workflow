@@ -26,7 +26,7 @@ async function registerTools(projectPath: string) {
   workflowSave(projectPath);
   workflowExecute(projectPath);
   workflowList(projectPath);
-  // registerPromptTools(projectPath);
+  await registerPromptTools(projectPath);
 
   // notice the tool changed
   server.sendToolListChanged();
