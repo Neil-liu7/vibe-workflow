@@ -29,9 +29,10 @@
     "url": "https://github.com/Neil-liu7/vibe-workflow/issues"
   },
   "homepage": "https://github.com/Neil-liu7/vibe-workflow#readme",
-  "description": "MCP server for custom workflow",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.18.0",
+    "@types/js-yaml": "^4.0.9",
+    "js-yaml": "^4.1.0",
     "zod": "^3.25.76"
   },
   "devDependencies": {
