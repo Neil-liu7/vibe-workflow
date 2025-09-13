@@ -9,7 +9,7 @@
   },
   "scripts": {
     "build": "npm run clean && tsc",
-    "start": "npm run build && npx @modelcontextprotocol/inspector node dist/index.js",
+    "start": "npm run build && DANGEROUSLY_OMIT_AUTH=true npx @modelcontextprotocol/inspector node dist/index.js",
     "clean": "rimraf dist",
     "web:dev": "concurrently \"npm run web:server\" \"npm run web:client\"",
     "web:server": "cd web-app/server && npm run dev",

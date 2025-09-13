@@ -6,6 +6,7 @@ import { validateProjectPath } from './path-utils.js';
 import { workflowCreate } from "./tools/workflow-create.js";
 import { workflowDefine } from "./tools/workflow-define.js";
 import { workflowExecute } from "./tools/workflow-execute.js";
+import { workflowList } from "./tools/workflow-list.js";
 import { workflowSave } from "./tools/workflow-save.js";
 import { registerPromptTools } from "./tools/prompt-manager.js";
 
@@ -24,7 +25,11 @@ async function registerTools(projectPath: string) {
   workflowCreate();
   workflowSave(projectPath);
   workflowExecute(projectPath);
-  registerPromptTools(projectPath);
+  workflowList(projectPath);
+  // registerPromptTools(projectPath);
+
+  // notice the tool changed
+  server.sendToolListChanged();
 }
 
 async function main() {

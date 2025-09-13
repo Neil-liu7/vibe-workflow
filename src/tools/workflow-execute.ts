@@ -1,5 +1,5 @@
 import { server } from '../server.js';
-import { GetPromptResult } from "@modelcontextprotocol/sdk/types.js";
+import { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 import { readFile } from "fs/promises";
 import { z } from "zod";
 
@@ -24,7 +24,7 @@ async function loadAndFlattenWorkflow(workflowName: string, projectPath: string,
     }
 
     const flattenedSteps = [];
-    
+
     for (const step of workflow.steps) {
         if (step.type === 'workflow') {
             // Recursively flatten sub-workflow steps
@@ -52,31 +52,28 @@ async function loadAndFlattenWorkflow(workflowName: string, projectPath: string,
 }
 
 export function workflowExecute(projectPath: string) {
-    server.prompt(
+    server.tool(
         "workflow-execute",
         "Execute a complete workflow with flattened steps.",
         {
             name: z.string().describe("Name of the workflow to execute."),
             inputs: z.any().describe("Initial inputs for the workflow."),
         },
-        async ({ name, inputs }): Promise<GetPromptResult> => {
+        async ({ name, inputs }): Promise<CallToolResult> => {
             try {
                 const workflow = await loadAndFlattenWorkflow(name, projectPath);
-                
+
                 return {
-                    messages: [
-                        {
-                            role: 'user',
-                            content: {
-                                type: 'text',
-                                text: `Execute workflow '${name}': ${workflow.description}
+                    content: [{
+                        type: 'text',
+                        text: `Execute workflow '${name}': ${workflow.description}
 
 **Execution Plan (${workflow.flattenedSteps.length} steps):**
 ${workflow.flattenedSteps.map((step, i) => {
-    const source = step._sourceWorkflow !== name ? ` (from ${step._sourceWorkflow})` : '';
-    const desc = step.description || step.template?.substring(0, 60) + '...' || 'No description';
-    return `${i + 1}. [${step.type.toUpperCase()}] ${desc}${source}`;
-}).join('\n')}
+                            const source = step._sourceWorkflow !== name ? ` (from ${step._sourceWorkflow})` : '';
+                            const desc = step.description || step.template?.substring(0, 60) + '...' || 'No description';
+                            return `${i + 1}. [${step.type.toUpperCase()}] ${desc}${source}`;
+                        }).join('\n')}
 
 **Initial Data:**
 ${JSON.stringify(inputs, null, 2)}
@@ -120,18 +117,13 @@ ${JSON.stringify(step, null, 2)}
 `).join('\n')}
 
 Begin execution now.`,
-                            },
-                        },
-                    ],
+                    }],
                 };
             } catch (error) {
                 return {
-                    messages: [
-                        {
-                            role: 'user',
-                            content: {
-                                type: 'text',
-                                text: `❌ Error loading workflow '${name}': ${error instanceof Error ? error.message : String(error)}
+                    content: [{
+                        type: 'text',
+                        text: `❌ Error loading workflow '${name}': ${error instanceof Error ? error.message : String(error)}
 
 **Troubleshooting:**
 1. Check that ${projectPath}/.workflow/${name}.json exists
@@ -140,9 +132,7 @@ Begin execution now.`,
 4. Check for circular dependencies
 
 **Available workflows:** List files in ${projectPath}/.workflow/ to see available workflows.`,
-                            },
-                        },
-                    ],
+                    }],
                 };
             }
         }
