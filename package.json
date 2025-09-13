@@ -1,11 +1,19 @@
 {
   "name": "workflow-mcp",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "MCP server for custom workflow",
   "main": "dist/index.js",
   "type": "module",
   "bin": {
-    "workflow": "./dist/index.js"
+    "workflow-mcp": "dist/index.js"
+  },
+  "files": [
+    "dist/",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=22.0.0"
   },
   "scripts": {
     "build": "npm run clean && tsc",

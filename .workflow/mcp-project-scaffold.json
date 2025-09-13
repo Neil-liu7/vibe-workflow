@@ -1,0 +1,84 @@
+{
+  "name": "mcp-project-scaffold",
+  "description": "使用 Yeoman 创建 MCP 服务项目脚手架",
+  "expectedOutputs": ["success", "projectPath", "message"],
+  "initialInputs": {
+    "projectName": "string",
+    "projectDescription": "string",
+    "authorName": "string",
+    "authorEmail": "string"
+  },
+  "steps": [
+    {
+      "type": "prompt",
+      "description": "验证项目名称和准备环境",
+      "template": "验证项目名称 '{{projectName}}' 是否符合 npm 包命名规范，并准备创建项目目录。项目名称应该是小写字母、数字、连字符组成，不能包含空格或特殊字符。",
+      "expectedOutputs": ["isValidName", "sanitizedName", "projectDir"],
+      "hints": "确保项目名称符合 npm 规范，生成合适的目录名"
+    },
+    {
+      "type": "mcp",
+      "tool": "executeBash",
+      "description": "全局安装 Yeoman 和 generator-mcp",
+      "inputMapping": {
+        "command": "npm install -g yo generator-mcp"
+      }
+    },
+    {
+      "type": "mcp",
+      "tool": "executeBash", 
+      "description": "检查 yo 是否安装成功",
+      "inputMapping": {
+        "command": "yo --version"
+      }
+    },
+    {
+      "type": "mcp",
+      "tool": "executeBash", 
+      "description": "检查可用的生成器",
+      "inputMapping": {
+        "command": "yo --generators"
+      }
+    },
+    {
+      "type": "prompt",
+      "description": "创建项目目录路径",
+      "template": "基于项目名称 '{{sanitizedName}}' 创建完整的项目目录路径。当前工作目录下创建新的子目录。",
+      "expectedOutputs": ["fullProjectPath", "relativePath"],
+      "hints": "生成相对路径和绝对路径"
+    },
+    {
+      "type": "mcp",
+      "tool": "executeBash",
+      "description": "创建项目目录",
+      "inputMapping": {
+        "command": "mkdir -p {{relativePath}}"
+      }
+    },
+    {
+      "type": "mcp",
+      "tool": "executeBash",
+      "description": "使用 yo mcp 生成项目（在项目目录中执行）",
+      "inputMapping": {
+        "command": "echo '{{projectName}}\n{{projectDescription}}\n{{authorName}}\n{{authorEmail}}\n' | yo mcp",
+        "path": "{{relativePath}}"
+      }
+    },
+    {
+      "type": "mcp",
+      "tool": "executeBash",
+      "description": "验证项目文件是否创建成功",
+      "inputMapping": {
+        "command": "ls -la",
+        "path": "{{relativePath}}"
+      }
+    },
+    {
+      "type": "prompt",
+      "description": "验证项目创建结果并生成最终消息",
+      "template": "检查项目 '{{projectName}}' 是否在目录 '{{fullProjectPath}}' 中成功创建。基于文件列表验证项目结构是否完整，生成包含项目路径、下一步操作建议的完整消息。",
+      "expectedOutputs": ["success", "message", "nextSteps"],
+      "hints": "提供项目创建成功的确认信息和后续开发建议，包括构建、启动等步骤"
+    }
+  ]
+}

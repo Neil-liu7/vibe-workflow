@@ -98,33 +98,108 @@ messages:
 
 ### 环境要求
 - Node.js 16+
-- TypeScript 5+
 
 ### 安装步骤
+
+#### 方式一：通过 npm 安装（推荐）
 ```bash
+# 全局安装
+npm install -g workflow-mcp
+
+# 或者本地安装
+npm install workflow-mcp
+```
+
+#### 方式二：从源码构建
+```bash
+# 克隆仓库
+git clone https://github.com/Neil-liu7/vibe-workflow.git
+cd vibe-workflow
+
 # 安装依赖
 npm install
 
 # 构建项目
 npm run build
-
-# 启动服务
-npm start
 ```
 
 ### MCP 配置
-在 Kiro 或其他支持 MCP 的客户端中配置：
+
+#### 使用本地安装的包
 ```json
 {
   "mcpServers": {
     "workflow-mcp": {
-      "command": "node",
-      "args": ["path/to/dist/index.js", "project-path"],
+      "command": "npx",
+      "args": ["workflow-mcp", "项目路径"],
       "disabled": false
     }
   }
 }
 ```
+
+#### 使用源码构建版本
+```json
+{
+  "mcpServers": {
+    "workflow-mcp": {
+      "command": "node",
+      "args": ["path/to/vibe-workflow/dist/index.js", "项目路径"],
+      "disabled": false
+    }
+  }
+}
+```
+
+### 配置说明
+- `项目路径`：指定工作流和提示词模板的存储目录，可以是绝对路径或相对路径
+- 如果不指定路径，默认使用当前工作目录
+- 确保指定的目录有读写权限
+
+### 验证安装
+安装完成后，可以通过以下方式验证：
+```bash
+# 检查版本（全局安装）
+workflow --help
+
+# 或者使用 npx（本地安装）
+npx workflow-mcp --help
+```
+
+### 快速开始示例
+
+#### 1. 创建项目目录
+```bash
+mkdir my-workflow-project
+cd my-workflow-project
+```
+
+#### 2. 配置 MCP 客户端
+在 Kiro 中添加以下配置到 `.kiro/settings/mcp.json`：
+```json
+{
+  "mcpServers": {
+    "workflow-mcp": {
+      "command": "workflow",
+      "args": ["."],
+      "disabled": false,
+      "autoApprove": [
+        "workflow_list",
+        "prompt_list",
+        "prompt_usage_stats"
+      ]
+    }
+  }
+}
+```
+
+#### 3. 重启 Kiro 或重新连接 MCP 服务器
+
+#### 4. 开始使用
+- 使用 `workflow_list` 查看可用工作流
+- 使用 `prompt_list` 查看可用提示词模板
+- 使用 `workflow_execute` 执行工作流
+- 使用各种内容生成工具（如 `gen_3d_webpage_html`、`gen_bento_grid_html` 等）
 
 ## 扩展开发
 

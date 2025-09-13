@@ -15,7 +15,7 @@ export class PromptManager {
   private usageStats: Map<string, PromptUsageStats> = new Map();
 
   constructor(projectPath: string) {
-    this.promptsDir = join(projectPath, 'prompts');
+    this.promptsDir = join(projectPath, '.prompts');
     this.usageStatsFile = join(projectPath, 'prompt-usage-stats.json');
     this.ensurePromptsDir();
     this.loadUsageStats();
